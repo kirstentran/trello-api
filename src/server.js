@@ -5,29 +5,62 @@
  */
 
 import express from 'express'
-import { mapOrder } from '~/utils/sorts.js'
+import exitHook from 'async-exit-hook'
+import { CONNECT_DB, GET_DB, CLOSE_DB } from '~/config/mongodb'
 
-const app = express()
+const START_SERVER =() => {
+  const app = express()
 
-const hostname = 'localhost'
-const port = 8017
+  const hostname = 'localhost'
+  const port = 8000
 
-app.get('/', (req, res) => {
-  // Test Absolute import mapOrder
-  // eslint-disable-next-line no-console
-  console.log(mapOrder(
-    [{ id: 'id-1', name: 'One' },
-      { id: 'id-2', name: 'Two' },
-      { id: 'id-3', name: 'Three' },
-      { id: 'id-4', name: 'Four' },
-      { id: 'id-5', name: 'Five' }],
-    ['id-5', 'id-4', 'id-2', 'id-3', 'id-1'],
-    'id'
-  ))
-  res.end('<h1>Hello World!</h1><hr>')
-})
+  app.get('/', async (req, res) => {
+    console.log(await GET_DB().listCollections().toArray())
+    process.exit(0)
+    res.end('<h1>Hello World!</h1><hr>')
+  })
 
-app.listen(port, hostname, () => {
-  // eslint-disable-next-line no-console
-  console.log(`Hello Trung Quan Dev, I am running at http://${ hostname }:${ port }/`)
-})
+  app.listen(port, hostname, () => {
+    // eslint-disable-next-line no-console
+    console.log(`3. Hello Trung Quan Dev, Backend-server is running at Host: ${hostname} and port:${ port}/`)
+  })
+
+  //Thực hiên các tác vụ cleanup trước khi server backend dừng
+  exitHook (() => {
+    console.log('4. Disconnecting from MongoDB...')
+    CLOSE_DB()
+    console.log('5. Disconnected from MongoDB successfully!')
+  })
+}
+
+//chỉ khi kết nối với Data BAse thành công thì start server Backend lên
+//Immediately Invoked Function Expression (IIFE)(Annonymous async function)
+(async () => {
+  try {
+    // eslint-disable-next-line no-console
+    console.log('1. Connecting to MongoDB cloud Atlas...')
+    await CONNECT_DB()
+    // eslint-disable-next-line no-console
+    console.log('2. Connected to MongoDB successfully!')
+
+    //Khởi đôngj server backend sau khi connect data base thành công 
+    START_SERVER()
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error(error)
+    process.exit(0)
+  }
+}) ()
+
+// //chỉ khi kết nối với Data BAse thành công thì start server Backend lên
+// console.log('1. Connecting to MongoDB cloud Atlas...')
+
+// CONNECT_DB()
+//   .then( () => console.log('2.Connected to MongoDB successfully!'))
+//   .then( () => START_SERVER())
+//   .catch(error => {
+//     // eslint-disable-next-line no-console
+//     console.error(error)
+//     process.exit(0)
+//   })
+
