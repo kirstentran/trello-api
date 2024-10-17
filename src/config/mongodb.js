@@ -32,7 +32,6 @@ export const CONNECT_DB = async () => {
 
 //Đóng kết nối tới Database khi cần
 export const CLOSE_DB = async () => {
-  console.log('code chay vao cho Close nay')
   await mongoClientInstance.close()
 }
 
