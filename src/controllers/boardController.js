@@ -5,20 +5,16 @@
  */
 import { StatusCodes } from 'http-status-codes'
 //Khi export default ApiError thì khi import vào file khác không cần dấu {}
+import { boardService } from '~/services/boardService'
 
 
 const createNew = async (req, res, next) => {
   try {
-    // console.log('REQ.Body:', req.body)
-    // console.log('REQ.query:', req.query)
-    // console.log('REQ.params:', req.params)
-    // console.log('REQ.files:', req.files)
-    // console.log('REQ.cookies:', req.cookies)
-    // console.log('REQ.jwtDecoded:', req.jwtDecoded)
+    //Dieu huong du lieu sang tang service
+    const createdBoard = await boardService.createNew(req.body)
 
     //Co ket qua tra ve phia client
-
-    res.status(StatusCodes.CREATED).json({ message: 'POST from controller: API create new board' })
+    res.status(StatusCodes.CREATED).json(createdBoard)
   } catch (error) {next(error)}
 }
 
