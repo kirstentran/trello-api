@@ -17,11 +17,10 @@ const createNew = async(reqBody) => {
 
     //Goi toi tang Model de xu ly luu ban ghi newBoard vao trong database
     const createdBoard = await boardModel.createNew(newBoard)
-    console.log(createdBoard)
 
     //lay ban ghi board sau khi goi (tuy muc dich du an ma co can buoc nay hay khong)
     const getNewBoard = await boardModel.findOneById(createdBoard.insertedId)
-    console.log (getNewBoard)
+
     //Ban notification ve cho admin khi co 1 cai board vua dc tao len
     //Phai co return de tra ket qua ve trong service
     return getNewBoard

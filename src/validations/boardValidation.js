@@ -4,6 +4,7 @@
  * "A bit of fragrance clings to the hand that gives flowers!"
  */
 
+//Validate 2 lan o BoardModel va BoardValidation
 import Joi from 'joi'
 import { StatusCodes } from 'http-status-codes'
 import ApiError from '~/utils/ApiError'
