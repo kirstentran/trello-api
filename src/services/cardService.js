@@ -5,6 +5,7 @@
  * "A bit of fragrance clings to the hand that gives flowers!"
  */
 import { cardModel } from '~/models/cardModel'
+import { columnModel } from '~/models/columnModel'
 
 
 const createNew = async(reqBody) => {
@@ -16,6 +17,10 @@ const createNew = async(reqBody) => {
     const getNewCard = await cardModel.findOneById(createdCard.insertedId)
 
     //xu ly du lieu tra ve..
+    if (getNewCard) {
+      //Cap nhat lai mang cardOrderIds trong collection column
+      await columnModel.pushCardOrderIds(getNewCard)
+    }
 
     return getNewCard
   } catch (error) { throw error}
