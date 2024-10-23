@@ -5,6 +5,7 @@
  * "A bit of fragrance clings to the hand that gives flowers!"
  */
 import { columnModel } from '~/models/columnModel'
+import { boardModel } from '~/models/boardModel'
 
 
 const createNew = async(reqBody) => {
@@ -15,7 +16,13 @@ const createNew = async(reqBody) => {
     const createdColumn = await columnModel.createNew(newColumn)
     const getNewColumn = await columnModel.findOneById(createdColumn.insertedId)
 
-    //xu ly du lieu tra ve
+    //xu ly cau truc du lieu truoc khi tra ve
+    if (getNewColumn) {
+      getNewColumn.cards = []
+      //Cap nhat lai mang columOrderIds trong collection  board
+      await boardModel.pushColumnOrderIds(getNewColumn)
+    }
+
     return getNewColumn
   } catch (error) { throw error}
 }
