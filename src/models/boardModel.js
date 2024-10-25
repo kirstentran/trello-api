@@ -31,6 +31,9 @@ const BOARD_COLLECTION_SCHEMA = Joi.object({
   _destroy: Joi.boolean().default(false)
 })
 
+//Chi dinh ra nhung fields ma chung ta khong muon cap nhat trong ham update
+const INVALID_UPDATE_FIELDS = ['_id', 'createdAt']
+
 const validateBeforeCreate = async (data) => {
   return await BOARD_COLLECTION_SCHEMA.validateAsync(data, { abortEarly: false })
 }
@@ -88,9 +91,26 @@ const pushColumnOrderIds = async (column) => {
       { $push: { columnOrderIds: new ObjectId(column._id) } },
       { returnDocument: 'after' }
     )
-    return result.value
+    return result
   } catch (error) {throw new Error (error)}
 }
+
+const update = async (boardId, updateData) => {
+  try {
+    Object.keys(updateData).forEach(fieldName => {
+      if (INVALID_UPDATE_FIELDS.includes(fieldName)) {
+        delete updateData[fieldName]
+      }
+    })
+    const result = await GET_DB().collection(BOARD_COLLECTION_NAME).findOneAndUpdate(
+      { _id: new ObjectId(boardId) },
+      { $set: updateData },
+      { returnDocument: 'after' }//tra ve kqua moi sau khi cap nhat
+    )
+    return result
+  } catch (error) {throw new Error (error)}
+}
+
 
 export const boardModel = {
   BOARD_COLLECTION_NAME,
@@ -98,7 +118,8 @@ export const boardModel = {
   createNew,
   findOneById,
   getDetails,
-  pushColumnOrderIds
+  pushColumnOrderIds,
+  update
 }
 
 //boardID: 6715d538052c1ca0cb07f089, columnId: 6716824cef37860ccf1956a2, cardID: 6716833cef37860ccf1956a5
