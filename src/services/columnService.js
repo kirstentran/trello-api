@@ -27,6 +27,20 @@ const createNew = async(reqBody) => {
   } catch (error) { throw error}
 }
 
+const update = async(columnId, reqBody) => {
+  try {
+    //Goi toi tang Model de xu ly luu ban ghi newBoard vao trong database
+    const updateData = {
+      ...reqBody,
+      updatedAt: Date.now()
+    }
+    const updatedColumn = await columnModel.update(columnId, updateData)
+
+    return updatedColumn
+  } catch (error) { throw error}
+}
+
 export const columnService = {
-  createNew
+  createNew,
+  update
 }
