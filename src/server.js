@@ -28,10 +28,21 @@ const START_SERVER =() => {
   //Middle ware xu ly loi tap trung
   app.use(errorHandlingMiddleware)
 
-  app.listen(env.APP_PORT, env.APP_HOST, () => {
-    // eslint-disable-next-line no-console
-    console.log(`3. Hello ${env.AUTHOR}, Backend-server is running at Host: ${env.APP_HOST} and port:${ env.APP_PORT}`)
-  })
+  if (env.BUILD_MODE === 'production') {
+    //Môi trg production, chạy trên Render.com
+    app.listen(process.env.PORT, () => {
+      // eslint-disable-next-line no-console
+      console.log(`3. Production: Hello ${env.AUTHOR}, Backend-server is running at port:${ process.env.PORT}`)
+    })
+  }
+  else {
+    //Môi trường local dev
+    app.listen(env.LOCAL_DEV_APP_PORT, env.LOCAL_DEV_APP_HOST, () => {
+      // eslint-disable-next-line no-console
+      console.log(`3. Local Dev: Hello ${env.AUTHOR}, Backend-server is running at Host: ${env.LOCAL_DEV_APP_HOST} and port:${ env.LOCAL_DEV_APP_PORT}`)
+    })
+  }
+
 
   //Thực hiên các tác vụ cleanup trước khi server backend dừng
   exitHook (() => {
