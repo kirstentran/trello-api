@@ -83,12 +83,26 @@ const getDetails = async (id) => {
   } catch (error) {throw new Error (error)}
 }
 
-//Nhiem vu: Push mot columnId vao cuoi mang columnOrderIds cua board
+// đẩy 1 phần tử columnId vào cuối mảng columnOrderIds của board
+//Dùng $push trong mongoDB ở trg hợp này để đẩy 1 phân phần tử vào cuối mảng
 const pushColumnOrderIds = async (column) => {
   try {
     const result = await GET_DB().collection(BOARD_COLLECTION_NAME).findOneAndUpdate(
       { _id: new ObjectId(column.boardId) },
       { $push: { columnOrderIds: new ObjectId(column._id) } },
+      { returnDocument: 'after' }
+    )
+    return result
+  } catch (error) {throw new Error (error)}
+}
+
+//Lấy 1 phần tử columnId ra khỏi mảng columnOrderIds của board
+//Dùng $pull trong mongoDB ở trg hợp này để lấy 1 phần tử ra khỏi mảng rồi xóa nó đi
+const pullColumnOrderIds = async (column) => {
+  try {
+    const result = await GET_DB().collection(BOARD_COLLECTION_NAME).findOneAndUpdate(
+      { _id: new ObjectId(column.boardId) },
+      { $pull: { columnOrderIds: new ObjectId(column._id) } },
       { returnDocument: 'after' }
     )
     return result
@@ -125,7 +139,8 @@ export const boardModel = {
   findOneById,
   getDetails,
   pushColumnOrderIds,
-  update
+  update,
+  pullColumnOrderIds
 }
 
 //boardID: 6715d538052c1ca0cb07f089, columnId: 6716824cef37860ccf1956a2, cardID: 6716833cef37860ccf1956a5

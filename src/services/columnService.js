@@ -7,6 +7,8 @@
 import { columnModel } from '~/models/columnModel'
 import { boardModel } from '~/models/boardModel'
 import { cardModel } from '~/models/cardModel'
+import ApiError from '~/utils/ApiError'
+import { StatusCodes } from 'http-status-codes'
 
 
 const createNew = async(reqBody) => {
@@ -43,13 +45,21 @@ const update = async(columnId, reqBody) => {
 
 const deleteItem = async ( columnId ) => {
   try {
+    const targetColumn = await columnModel.findOneById(columnId)
+
+    if (!targetColumn) {
+      throw new ApiError (StatusCodes.NOT_FOUND, 'Column not found!')
+    }
     //Xóa column
     await columnModel.deleteOneById(columnId)
 
     //XÓa toàn bộ cards thuộc column trên
     await cardModel.deleteManyByColumnId(columnId)
 
-    return { deleteResult: ' Column and all cards in it are deleted successfully' }
+    //Xóa columnId trong mang columnOrderIds cua cai board chua no
+    await boardModel.pullColumnOrderIds(targetColumn)
+
+    return { deleteResult: 'Column and all cards in it are deleted successfully' }
   } catch (error) { throw error}
 }
 
